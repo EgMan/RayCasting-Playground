@@ -105,7 +105,7 @@ public class RayTracingMaster : MonoBehaviour
         }
         sphere.position = obj.transform.position; //todo handle local to global conversion
         sphere.radius = obj.transform.localScale.x * collider.radius;
-        sphere.albedo = Vector3.zero;
+        sphere.albedo = new Vector3(0.5f, 0.5f, 0.5f);
         //sphere.specular = new Vector3(Random.value, Random.value, Random.value);
         sphere.specular = new Vector3(1.0f, 0.78f, 0.34f);
         return sphere;

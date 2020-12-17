@@ -72,8 +72,8 @@ void IntersectGroundPlane(Ray ray, inout RayHit bestHit)
         bestHit.distance = t;
         bestHit.position = ray.origin + t * ray.direction;
         bestHit.normal = float3(0.0f, 1.0f, 0.0f);
-        bestHit.specular = float3(0.5f, 0.39f, 0.17f);
-        bestHit.albedo = float3(0.0f, 0.0f, 0.0f);
+        bestHit.specular = float3(0.25f, 0.195f, 0.085f);
+        bestHit.albedo = float3(0.7f, 0.7f, 0.7f);
     }
 }
 
@@ -120,9 +120,16 @@ float3 Shade(inout Ray ray, RayHit hit)
         ray.direction = reflect(ray.direction, hit.normal);
         ray.energy *= hit.specular;
 
+        // Shadow test ray
+        bool shadow = false;
+        Ray shadowRay = CreateRay(hit.position + hit.normal * 0.001f, -1 * _DirectionalLight.xyz);
+        RayHit shadowHit = Trace(shadowRay);
+        if (shadowHit.distance != 1.#INF)
+        {
+            return float3(0.0f, 0.0f, 0.0f);
+        }
         // Return a diffuse-shaded color
-        return float3(0.0f, 0.0f, 0.0f);
-        //return saturate(dot(hit.normal, _DirectionalLight.xyz) * -1) * _DirectionalLight.w * hit.albedo;
+        return saturate(dot(hit.normal, _DirectionalLight.xyz) * -1) * _DirectionalLight.w * hit.albedo;
     }
     else
     {
