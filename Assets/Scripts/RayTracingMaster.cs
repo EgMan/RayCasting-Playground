@@ -5,7 +5,6 @@ public class RayTracingMaster : MonoBehaviour
     public ComputeShader RayTracingShader;
     public Texture SkyboxTexture;
     public Light DirectionalLight;
-    public List<GameObject> spheres;
     private RenderTexture _target;
     private Camera _camera;
     private uint _currentSample = 0;
@@ -86,11 +85,14 @@ public class RayTracingMaster : MonoBehaviour
     private void convertAllSpheres()
     {
         List<Sphere> spheresConverted = new List<Sphere>();
+        GameObject[] spheres = GameObject.FindGameObjectsWithTag("RTsphere");
+
         foreach (GameObject obj in spheres)
         {
             spheresConverted.Add(toSphere(obj));
         }
-        _sphereBuffer = new ComputeBuffer(spheres.Count, 40); //todo change 40 to sizeOf
+        _sphereBuffer?.Dispose();
+        _sphereBuffer = new ComputeBuffer(spheres.Length, 40); //todo change 40 to sizeOf
         _sphereBuffer.SetData(spheresConverted);
         RayTracingShader.SetBuffer(0, "_Spheres", _sphereBuffer);
     }
@@ -109,5 +111,9 @@ public class RayTracingMaster : MonoBehaviour
         //sphere.specular = new Vector3(Random.value, Random.value, Random.value);
         sphere.specular = new Vector3(1.0f, 0.78f, 0.34f);
         return sphere;
+    }
+    private void OnApplicationQuit()
+    {
+        _sphereBuffer?.Dispose();
     }
 }
