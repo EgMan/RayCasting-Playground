@@ -7,6 +7,7 @@ public class RayTracingMaster : MonoBehaviour
     public Texture SkyboxTexture;
     public Light DirectionalLight;
     private RenderTexture _target;
+    private RenderTexture _converged;
     private Camera _camera;
     private uint _currentSample = 0;
     private Material _addMaterial;
@@ -29,7 +30,7 @@ public class RayTracingMaster : MonoBehaviour
     {
         if (!realTime)
         {
-        convertAllSpheres();
+        convertScene();
         }
     }
 
@@ -54,6 +55,8 @@ public class RayTracingMaster : MonoBehaviour
         RayTracingShader.SetMatrix("_CameraToWorld", _camera.cameraToWorldMatrix);
         RayTracingShader.SetMatrix("_CameraInverseProjection", _camera.projectionMatrix.inverse);
         RayTracingShader.SetTexture(0, "_SkyboxTexture", SkyboxTexture);
+        RayTracingShader.SetFloat("_Seed", Random.value);
+        RayTracingShader.SetBool("_RealTime", realTime);
         if (realTime)
         {
             RayTracingShader.SetVector("_PixelOffset", new Vector2(0.0f, 0.0f));
@@ -69,7 +72,7 @@ public class RayTracingMaster : MonoBehaviour
         InitRenderTexture();
         if (realTime)
         {
-            convertAllSpheres();
+            convertScene();
         }
         // Set the target and dispatch the compute shader
         RayTracingShader.SetTexture(0, "Result", _target);
@@ -93,7 +96,8 @@ public class RayTracingMaster : MonoBehaviour
             if (_addMaterial == null)
                 _addMaterial = new Material(Shader.Find("Hidden/AddShader"));
             _addMaterial.SetFloat("_Sample", _currentSample);
-            Graphics.Blit(_target, destination, _addMaterial);
+            Graphics.Blit(_target, _converged, _addMaterial);
+            Graphics.Blit(_converged, destination);
             _currentSample++;
         }
         lastRealTimeVal = realTime;
@@ -111,9 +115,21 @@ public class RayTracingMaster : MonoBehaviour
             _target.enableRandomWrite = true;
             _target.Create();
         }
+
+        if (_converged == null || _converged.width != Screen.width || _converged.height != Screen.height)
+        {
+            // Release render texture if we already have one
+            if (_converged != null)
+                _converged.Release();
+            // Get a render target for Ray Tracing
+            _converged = new RenderTexture(Screen.width, Screen.height, 0,
+                RenderTextureFormat.ARGBFloat, RenderTextureReadWrite.Linear);
+            _converged.enableRandomWrite = true;
+            _converged.Create();
+        }
     }
 
-    private void convertAllSpheres()
+    private void convertScene()
     {
         List<Sphere> spheresConverted = new List<Sphere>();
         GameObject[] spheres = GameObject.FindGameObjectsWithTag("RTsphere");
