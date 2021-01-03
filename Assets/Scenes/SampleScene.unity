@@ -1005,6 +1005,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 88af19d12cfd3aa4d89304cc932d5e29, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  realTime: 0
   RayTracingShader: {fileID: 7200000, guid: 9769a2f2f45d6ea408e025f6e7f8bbbf, type: 3}
   SkyboxTexture: {fileID: 8900000, guid: 18ec2d52be8f4524a97c25a2ed27838e, type: 3}
   DirectionalLight: {fileID: 705507994}

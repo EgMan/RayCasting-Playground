@@ -15,10 +15,12 @@ public class RayTracingMaster : MonoBehaviour
     private bool lastRealTimeVal = true;
     public struct Sphere
     {
-        public Vector3 position;
         public float radius;
+        public float smoothness;
+        public Vector3 position;
         public Vector3 albedo;
         public Vector3 specular;
+        public Vector3 emission;
     };
 
     private void Awake()
@@ -48,6 +50,7 @@ public class RayTracingMaster : MonoBehaviour
         SetShaderParameters();
         Render(destination);
     }
+
     private void SetShaderParameters()
     {
         Vector3 l = DirectionalLight.transform.forward;
@@ -66,6 +69,7 @@ public class RayTracingMaster : MonoBehaviour
             RayTracingShader.SetVector("_PixelOffset", new Vector2(Random.value, Random.value));
         }
     }
+
     private void Render(RenderTexture destination)
     {
         // Make sure we have a current render target
@@ -139,7 +143,9 @@ public class RayTracingMaster : MonoBehaviour
             spheresConverted.Add(toSphere(obj));
         }
         _sphereBuffer?.Dispose();
-        _sphereBuffer = new ComputeBuffer(spheres.Length, 40); //todo change 40 to sizeOf
+        int sizeOfSphere = System.Runtime.InteropServices.Marshal.SizeOf(typeof(Sphere));
+        Debug.Log($"sizeof: {sizeOfSphere}");
+        _sphereBuffer = new ComputeBuffer(spheres.Length, sizeOfSphere);
         _sphereBuffer.SetData(spheresConverted);
         RayTracingShader.SetBuffer(0, "_Spheres", _sphereBuffer);
     }
@@ -153,10 +159,11 @@ public class RayTracingMaster : MonoBehaviour
             Debug.LogError($"object: {obj.name} has no associated sphere collider, and is probably not a sphere object.");
         }
         sphere.position = obj.transform.position; //todo handle local to global conversion
+        sphere.smoothness = 1000000f;
         sphere.radius = obj.transform.localScale.x * collider.radius;
         sphere.albedo = new Vector3(0.5f, 0.5f, 0.5f);
-        //sphere.specular = new Vector3(Random.value, Random.value, Random.value);
         sphere.specular = new Vector3(1.0f, 0.78f, 0.34f);
+        sphere.emission = new Vector3(0.01f, 0.01f, 0.01f);
         return sphere;
     }
     private void OnApplicationQuit()
