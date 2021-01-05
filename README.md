@@ -6,6 +6,17 @@
 [Coding Adventure: Ray Marching - Sebastial Lague](https://www.youtube.com/watch?v=Cp5WWtMoeKg&ab_channel=SebastianLague)   
    
 ### screenshots from my adventures:   
-A cool bug   
+Glass orbs
+![](images/glassOrb.PNG)
+    
+More glass orbs
+![](images/moreGlassOrbs)
+   
+Matte green
+![](images/matteGreen.PNG)
+    
+A bug with spectral reflection
 ![](images/specularReflectionBug.PNG)
-
+    
+A bug with refraction
+![](stripedRefractionBug.PNG)

@@ -17,6 +17,9 @@ public class RayTracingMaster : MonoBehaviour
     {
         public float radius;
         public float smoothness;
+        public float opacity;
+        public float refractiveSmoothness;
+        public float refractionIndex;
         public Vector3 position;
         public Vector3 albedo;
         public Vector3 specular;
@@ -160,6 +163,9 @@ public class RayTracingMaster : MonoBehaviour
         }
         sphere.position = obj.transform.position; //todo handle local to global conversion
         sphere.smoothness = 1000000f;
+        sphere.opacity = 0.25f;
+        sphere.refractiveSmoothness = 100000f;
+        sphere.refractionIndex = 1.5f;
         sphere.radius = obj.transform.localScale.x * collider.radius;
         sphere.albedo = new Vector3(1.0f, 0.78f, 0.34f);
         sphere.specular = new Vector3(1.0f, 0.78f, 0.34f);

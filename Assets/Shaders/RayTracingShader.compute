@@ -24,10 +24,14 @@ struct Ray
     float3 direction;
     float3 energy;
 };
+
 struct RayHit
 {
     float distance;
     float smoothness;
+    float opacity;
+    float refractiveSmoothness;
+    float refractionScalar;
     float3 position;
     float3 normal;
     float3 specular;
@@ -39,6 +43,9 @@ struct Sphere
 {
     float radius;
     float smoothness; // only utilized in static raytracing
+    float opacity;
+    float refractiveSmoothness;
+    float refractionIndex;
     float3 position;
     float3 albedo;
     float3 specular;
@@ -59,11 +66,14 @@ RayHit CreateRayHit()
     RayHit hit;
     hit.distance = 1.#INF;
     hit.smoothness = 0.0f;
+    hit.opacity = 1.0f;
+    hit.refractiveSmoothness = 0.0f;
+    hit.refractionScalar = 1.0f;
     hit.position = float3(0.0f, 0.0f, 0.0f);
     hit.normal = float3(0.0f, 0.0f, 0.0f);
     hit.specular = float3(0.0f, 0.0f, 0.0f);
     hit.albedo = float3(0.0f, 0.0f, 0.0f);
-    hit.emission = float3(0.0f, 0.0f, 0.0f);;
+    hit.emission = float3(0.0f, 0.0f, 0.0f);
     return hit;
 }
 
@@ -115,6 +125,16 @@ void IntersectSphere(Ray ray, inout RayHit bestHit, Sphere sphere)
         bestHit.specular = sphere.specular;
         bestHit.albedo = sphere.albedo;
         bestHit.emission = sphere.emission;
+        bestHit.opacity = sphere.opacity;
+        bestHit.refractiveSmoothness = sphere.refractiveSmoothness;
+        if (dot(bestHit.normal, ray.direction) < 0)
+        {
+            bestHit.refractionScalar = 1.0f / sphere.refractionIndex;
+        }
+        else
+        {
+            bestHit.refractionScalar = sphere.refractionIndex;
+        }
     }
 }
 
@@ -188,6 +208,43 @@ float3 Shade(inout Ray ray, RayHit hit)
         }
         else
         {
+            // Refraction
+            if (rand() > hit.opacity)
+            {
+                float3 dir;
+                float3 orig;
+                if (dot(ray.direction, hit.normal) > 0.0f)
+                {
+                    orig = hit.position + hit.normal * 0.001f;
+                    dir = refract(normalize(ray.direction), -hit.normal, hit.refractionScalar);
+                }
+                else
+                {
+                    orig = hit.position - hit.normal * 0.001f;
+                    dir = refract(normalize(ray.direction), hit.normal, hit.refractionScalar);
+                }
+                if (length(dir) != 0.0f)
+                {
+
+                    // float f = (alpha + 2) / (alpha + 1); 
+                    // ray.energy *= (1.0f / specChance) * hit.specular * sdot(hit.normal, ray.direction, f); // todo impart energy change
+
+                    ray.direction = SampleHemisphere(dir, hit.refractiveSmoothness);
+                    ray.origin = orig;
+                    return hit.emission;
+                }
+
+                // Very small incident angles
+                else
+                {
+                    // continue straight
+                    ray.origin = hit.position + hit.normal * 0.001f;
+                    // ray.direction = reflect(ray.direction, hit.normal);
+                    // ray.energy *= hit.specular * sdot(hit.normal, ray.direction); // todo impart energy change
+                    return hit.emission;
+                }
+            }
+
             // Calculate chances of diffuse and specular reflection
             hit.albedo = min(1.0f - hit.specular, hit.albedo);
             float specChance = energy(hit.specular);
@@ -226,7 +283,8 @@ float3 Shade(inout Ray ray, RayHit hit)
 
         // Erase the ray's energy - the sky doesn't reflect anything
         ray.energy = 0.0f;
-        return float3(1.0f, 1.0f, 1.0f);
+        //return float3(1.0f, 1.0f, 1.0f);
+        return float3(normalize(ray.direction) * 0.5f + 0.5f);
     }
 }
 
