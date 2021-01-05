@@ -170,8 +170,6 @@ float3 Shade(inout Ray ray, RayHit hit)
     {
         if (_RealTime)
         {
-            // Whitted
-            float3 specular = float3(1.0f, 0.78f, 0.34f);
             // Reflect the ray and multiply energy with specular reflection
             ray.origin = hit.position + hit.normal * 0.001f;
             ray.direction = reflect(ray.direction, hit.normal);
@@ -213,7 +211,7 @@ float3 Shade(inout Ray ray, RayHit hit)
                 // Lambert diffuse reflection
                 ray.origin = hit.position + hit.normal * 0.001f;
                 ray.direction = SampleHemisphere(hit.normal, 1.0f);
-                ray.energy *= (1.0f / diffChance) * hit.albedo;
+                ray.energy *= (1.0f / diffChance) * hit.albedo * hit.albedo;
             }
 
             return hit.emission;
@@ -228,7 +226,7 @@ float3 Shade(inout Ray ray, RayHit hit)
 
         // Erase the ray's energy - the sky doesn't reflect anything
         ray.energy = 0.0f;
-        return float3(ray.direction * 0.5f + 0.5f);
+        return float3(1.0f, 1.0f, 1.0f);
     }
 }
 
