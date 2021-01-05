@@ -10,7 +10,7 @@ Glass orbs
 ![](images/glassOrb.PNG)
     
 More glass orbs
-![](images/moreGlassOrbs)
+![](images/moreGlassOrbs.PNG)
    
 Matte green
 ![](images/matteGreen.PNG)
@@ -19,4 +19,4 @@ A bug with spectral reflection
 ![](images/specularReflectionBug.PNG)
     
 A bug with refraction
-![](stripedRefractionBug.PNG)
+![](images/stripedRefractionBug.PNG)
