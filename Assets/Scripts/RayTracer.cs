@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
-public class RayTracingMaster : MonoBehaviour
+public class RayTracer : MonoBehaviour
 {
     public bool realTime = true;
     public ComputeShader RayTracingShader;
@@ -101,7 +101,7 @@ public class RayTracingMaster : MonoBehaviour
 
             // Blit the result texture to the screen
             if (_addMaterial == null)
-                _addMaterial = new Material(Shader.Find("Hidden/AddShader"));
+                _addMaterial = new Material(Shader.Find("Hidden/SummationShader"));
             _addMaterial.SetFloat("_Sample", _currentSample);
             Graphics.Blit(_target, _converged, _addMaterial);
             Graphics.Blit(_converged, destination);

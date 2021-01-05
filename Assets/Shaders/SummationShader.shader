@@ -1,4 +1,4 @@
-﻿Shader "Hidden/AddShader"
+﻿Shader "Hidden/SummationShader"
 {
     Properties
     {
