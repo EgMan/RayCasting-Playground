@@ -23,6 +23,7 @@ public class RayTracer : MonoBehaviour
         public Vector3 position;
         public Vector3 albedo;
         public Vector3 specular;
+        public Vector3 refractionTint;
         public Vector3 emission;
     };
 
@@ -169,6 +170,8 @@ public class RayTracer : MonoBehaviour
         sphere.radius = obj.transform.localScale.x * collider.radius;
         sphere.albedo = new Vector3(1.0f, 0.78f, 0.34f);
         sphere.specular = new Vector3(1.0f, 0.78f, 0.34f);
+        // sphere.refractionTint = new Vector3(1.0f, 0.78f, 0.34f);
+        sphere.refractionTint = new Vector3(0.30f, 0.30f, 0.90f);
         sphere.emission = new Vector3(0.01f, 0.01f, 0.01f);
         return sphere;
     }
