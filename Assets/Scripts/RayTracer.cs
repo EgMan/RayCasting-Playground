@@ -154,6 +154,11 @@ public class RayTracer : MonoBehaviour
         RayTracingShader.SetBuffer(0, "_Spheres", _sphereBuffer);
     }
 
+    private Vector3 colToVect(Color col)
+    {
+        return new Vector3(col.r, col.g, col.b);
+    }
+
     private Sphere toSphere(GameObject obj)
     {
         Sphere sphere = new Sphere();
@@ -163,16 +168,32 @@ public class RayTracer : MonoBehaviour
             Debug.LogError($"object: {obj.name} has no associated sphere collider, and is probably not a sphere object.");
         }
         sphere.position = obj.transform.position; //todo handle local to global conversion
-        sphere.smoothness = 1000000f;
-        sphere.opacity = 0.25f;
-        sphere.refractiveSmoothness = 100000f;
-        sphere.refractionIndex = 1.5f;
         sphere.radius = obj.transform.localScale.x * collider.radius;
-        sphere.albedo = new Vector3(1.0f, 0.78f, 0.34f);
-        sphere.specular = new Vector3(1.0f, 0.78f, 0.34f);
-        // sphere.refractionTint = new Vector3(1.0f, 0.78f, 0.34f);
-        sphere.refractionTint = new Vector3(0.30f, 0.30f, 0.90f);
-        sphere.emission = new Vector3(0.01f, 0.01f, 0.01f);
+
+        RTMaterial mat = obj.GetComponent<RTMaterial>();
+        if (mat != null)
+        {
+            sphere.smoothness = mat.smoothness;
+            sphere.opacity = mat.opacity;
+            sphere.refractiveSmoothness = mat.refractiveSmoothness;
+            sphere.refractionIndex = mat.refractionIndex;
+            sphere.albedo = colToVect(mat.albedo);
+            sphere.specular = colToVect(mat.specular);
+            sphere.refractionTint = colToVect(mat.refractionTint);
+            sphere.emission = colToVect(mat.emission);
+        }
+        else
+        {
+            sphere.smoothness = 1000000f;
+            sphere.opacity = 0.25f;
+            sphere.refractiveSmoothness = 100000f;
+            sphere.refractionIndex = 1.5f;
+            sphere.albedo = new Vector3(1.0f, 0.78f, 0.34f);
+            sphere.specular = new Vector3(1.0f, 0.78f, 0.34f);
+            // sphere.refractionTint = new Vector3(1.0f, 0.78f, 0.34f);
+            sphere.refractionTint = new Vector3(0.30f, 0.30f, 0.90f);
+            sphere.emission = new Vector3(0.01f, 0.01f, 0.01f);
+        }
         return sphere;
     }
     private void OnApplicationQuit()

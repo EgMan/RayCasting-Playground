@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 8363576}
   - component: {fileID: 8363575}
   - component: {fileID: 8363574}
+  - component: {fileID: 8363579}
   m_Layer: 0
   m_Name: Sphere (10)
   m_TagString: RTsphere
@@ -231,6 +232,26 @@ Transform:
   m_Father: {fileID: 27811354}
   m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8363579
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8363573}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0744eb5d0fa4d224fb4d0eecfb4e2ae9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  smoothness: 0
+  opacity: 0
+  refractiveSmoothness: 0
+  refractionIndex: 0
+  albedo: {r: 0, g: 0, b: 0, a: 0}
+  specular: {r: 0, g: 0, b: 0, a: 0}
+  refractionTint: {r: 0, g: 0, b: 0, a: 0}
+  emission: {r: 0, g: 0, b: 0, a: 1}
 --- !u!1 &27811353
 GameObject:
   m_ObjectHideFlags: 0
