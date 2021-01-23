@@ -190,13 +190,48 @@ float3 SampleHemisphere(float3 normal, float alpha)
 
 float3 Shade(inout Ray ray, RayHit hit)
 {
+    bool hitOutOf = dot(ray.direction, hit.normal) > 0.0f;
     if (hit.distance < 1.#INF)
     {
         if (_RealTime)
         {
-            // Reflect the ray and multiply energy with specular reflection
-            ray.origin = hit.position + hit.normal * 0.001f;
-            ray.direction = reflect(ray.direction, hit.normal);
+            if (hit.opacity < 1.0f)
+            {
+                float3 dir;
+                float3 orig;
+                if (hitOutOf)
+                {
+                    orig = hit.position + hit.normal * 0.001f;
+                    dir = refract(normalize(ray.direction), -hit.normal, hit.refractionScalar);
+                    ray.energy *= hit.refractionTint;
+                }
+                // ray entering object
+                else
+                {
+                    orig = hit.position - hit.normal * 0.001f;
+                    dir = refract(normalize(ray.direction), hit.normal, hit.refractionScalar);
+                }
+
+                // refraction angle calculated succesfully
+                if (length(dir) != 0.0f)
+                {
+                    ray.direction = dir;
+                    ray.origin = orig;
+                }
+                // Calculating refraction failed due to small incident angles
+                else
+                {
+                    // continue straight
+                    ray.origin = hit.position + hit.normal * 0.001f;
+                }
+                return float3(0.0f, 0.0f, 0.0f);
+            }
+            else
+            {
+                // Reflect the ray and multiply energy with specular reflection
+                ray.origin = hit.position + hit.normal * 0.001f;
+                ray.direction = reflect(ray.direction, hit.normal);
+            }
             ray.energy *= hit.specular;
 
             // Shadow test ray
@@ -218,7 +253,7 @@ float3 Shade(inout Ray ray, RayHit hit)
                 float3 dir;
                 float3 orig;
                 // ray leaving object
-                if (dot(ray.direction, hit.normal) > 0.0f)
+                if (hitOutOf)
                 {
                     orig = hit.position + hit.normal * 0.001f;
                     dir = refract(normalize(ray.direction), -hit.normal, hit.refractionScalar);
